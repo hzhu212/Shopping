@@ -11,30 +11,31 @@ require_once "../goods_management/DSDGoodsManager.php";
 
 class DSDRequestGoodsHandler{
     
-    public static function all() {
-        Utils::ensureKeys(@$_GET, ["page"]);
-        $info = DSDGoodsManager::view_all_goods(@$_GET["page"]);
+    public static function all($page, $num_per_page) {
+        $info = DSDGoodsManager::view_all_goods($page, $num_per_page);
         DSDRequestResponder::respond(true, null, $info);
     }
 
-    public static function category() {
-        Utils::ensureKeys(@$_GET, ["page", "cid"]);
-        if (!DSDGoodsManager::check_cid(@$_GET["cid"])) {
-            DSDRequestResponder::respond(false, "类别不存在", nil);
+    public static function category($cid, $page, $num_per_page) {
+        if (!DSDGoodsManager::check_category($cid)) {
+            DSDRequestResponder::http_code(404, false);
+            DSDRequestResponder::respond(false, "类别不存在");
         }
-        $info = DSDGoodsManager::view_goods_by_category(@$_GET["cid"], @$_GET["page"]);
+        $info = DSDGoodsManager::view_goods_by_category($cid, $page, $num_per_page);
         DSDRequestResponder::respond(true, null, $info);
     }
 
-    public static function search() {
-        Utils::ensureKeys(@$_GET, ["page", "keyword"]);
-        $info = DSDGoodsManager::search_goods(@$_GET["keyword"], @$_GET["page"]);
+    public static function search($keyword, $page, $num_per_page) {
+        $info = DSDGoodsManager::search_goods($keyword, $page, $num_per_page);
         DSDRequestResponder::respond(true, null, $info);
     }
 
-    public static function detail() {
-        Utils::ensureKeys(@$_GET, ["gid"]);
-        $info = DSDGoodsManager::view_certain_goods(@$_GET["gid"]);
+    public static function detail($gid) {
+        if (!DSDGoodsManager::check_goods($gid)) {
+            DSDRequestResponder::http_code(404, false);
+            DSDRequestResponder::respond(false, "商品不存在");
+        }
+        $info = DSDGoodsManager::view_certain_goods($gid);
         DSDRequestResponder::respond(true, null, $info);
     }
 }
